@@ -34,7 +34,6 @@ class Catalogo:
 #lista para productos
 productos = [] 
 
-
 def agregar_producto(codigo, descripcion, cantidad, precio, imagen, proveedor):
 
   if consultar_producto(codigo):
