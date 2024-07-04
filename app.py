@@ -19,16 +19,51 @@ class Catalogo:
       cantidad INT NOT NULL,
       precio DECIMAL(10, 2) NOT NULL,
       imagen_url VARCHAR(255),
-      proveedor INT(4)''')
+      proveedor INT(4))''')
     self.conn.commit()
+  
+  def consultar_producto(self, codigo):
+    self.cursor.execute(f"SELECT * FROM productos WHERE codigo = {codigo}")
+    return self.cursor.fetchone()
 
-  def agregar_producto(self, codigo, description, cantidad, precio, imagen, proveedor):
-    sql = "INSERT productos (descripcion, cantidad,precio, imagen, proveedor) VALUES (%s, %s, %s, %s, %s)"
+  def agregar_producto(self, description, cantidad, precio, imagen, proveedor):
+    sql = "INSERT productos (descripcion, cantidad,precio, imagen_url, proveedor) VALUES (%s, %s, %s, %s, %s)"
     valores = (description, cantidad, precio, imagen, proveedor)
 
     self.cursor.execute(sql, valores)
     self.conn.commit()
     return self.cursor.lastrowid
+  
+  def modificar_producto(self, codigo, nueva_descripcion, nueva_cantidad, nuevo_precio, nueva_imagen,nuevo_proveedor ):
+    sql = "UPDATE productos SET descripcion = %s, cantidad=%s, precio=%s, imagen_url=%s, proveedor=%s WHERE codigo=%s"
+    valores = (nueva_descripcion, nueva_cantidad, nuevo_precio, nueva_imagen, nuevo_proveedor, codigo)
+    self.cursor.execute(sql, valores)
+    self.conn.commit()
+
+    return self.cursor.rowcount > 0
+  
+  def mostrar_producto(self, codigo):
+    producto = self.consultar_producto(codigo)
+    if producto:
+      print( "-" * 40 )
+      print(f"Codigo.......:{producto['codigo']}")
+      print(f"Descripcion..:{producto['descripcion']}")
+      print(f"Cantidad.....:{producto['cantidad']}")
+      print(f"Precio.......:{producto['precio']}")
+      print(f"Proveedor....:{producto['imagen_url']}")
+      print(f"Imagen.......:{producto['proveedor']}")
+      print("-" * 40)
+    else:
+      print("Producto no encontrado")
+
+  def listar_productos(self):
+    self.cursor.execute("SELECT * FROM productos")
+    productos = self.cursor.fetchall()
+    return productos
+  
+  def eliminar_producto(self, codigo):
+    self.cursor.execute(f"DELETE FROM productos WHERE codigo = {codigo}")
+    return self.cursor.rowcount
 
 
 #lista para productos
@@ -127,4 +162,23 @@ agregar_producto(5, "Mando", 250, 15500, "imagen.jpg","Peru")
 # #listamos productos de nuevo
 # listar_productos()
 
-catalogo = Catalogo(host= 'localhost', user='root', password='root', database='miapp')
+catalogo = Catalogo(host= 'localhost', user='root', password='', database='miapp')
+catalogo.agregar_producto("taclado Qwerty",15, 11000.0, 'teclado.jpg', 21 )
+catalogo.agregar_producto("taclado Led ",25, 19000.0, 'teclado_RGB.jpg', 200 )
+
+
+#onsultamos un productos y lo mostramos
+#cod_pro = int(input("Ingrese el codigo del producto"))
+#producto = catalogo.consultar_producto(cod_pro)
+producto = catalogo.modificar_producto(2,"Mouse con bolitasss",8, 55000.0, 'Mouse_Colita.jpg', 300 )
+print(producto)
+if producto:
+  print(f"Producto encontrado")
+else: 
+  print(f"Producto no encontrado")
+catalogo.mostrar_producto(200)
+catalogo.eliminar_producto(2)
+productos = catalogo.listar_productos()
+
+for producto in productos:
+  print(producto)
