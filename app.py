@@ -47,13 +47,15 @@ class Catalogo:
                 raise err
 
         # Una vez que la base de datos está establecida, creamos la tabla si no existe
-        self.cursor.execute('''CREATE TABLE IF NOT EXISTS productos (
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS turnos (
             codigo INT AUTO_INCREMENT PRIMARY KEY,
-            descripcion VARCHAR(255) NOT NULL,
-            cantidad INT NOT NULL,
-            precio DECIMAL(10, 2) NOT NULL,
-            imagen_url VARCHAR(255),
-            proveedor INT(4))''')
+            nombreCompleto VARCHAR(255) NOT NULL,                
+            telefono INT(12),
+            correo VARCHAR(255) NOT NULL,
+            dia VARCHAR(255) NOT NULL,                
+            horario VARCHAR(5) NOT NULL,
+            imagen_url VARCHAR(255)
+            )''')
         self.conn.commit()
 
         # Cerrar el cursor inicial y abrir uno nuevo con el parámetro dictionary=True
@@ -61,10 +63,10 @@ class Catalogo:
         self.cursor = self.conn.cursor(dictionary=True)
         
     #----------------------------------------------------------------
-    def agregar_producto(self, descripcion, cantidad, precio, imagen, proveedor):
+    def agregar_producto(self, nombreCompleto, telefono, correo, dia, horario, imagen):
                
-        sql = "INSERT INTO productos (descripcion, cantidad, precio, imagen_url, proveedor) VALUES (%s, %s, %s, %s, %s)"
-        valores = (descripcion, cantidad, precio, imagen, proveedor)
+        sql = "INSERT INTO turnos (nombreCompleto, telefono, correo, dia, horario, imagen_url) VALUES (%s, %s, %s, %s, %s, %s)"
+        valores = (nombreCompleto, telefono, correo, dia, horario, imagen)
 
         self.cursor.execute(sql, valores)        
         self.conn.commit()
@@ -73,27 +75,27 @@ class Catalogo:
     #----------------------------------------------------------------
     def consultar_producto(self, codigo):
         # Consultamos un producto a partir de su código
-        self.cursor.execute(f"SELECT * FROM productos WHERE codigo = {codigo}")
+        self.cursor.execute(f"SELECT * FROM turnos WHERE codigo = {codigo}")
         return self.cursor.fetchone()
 
     #----------------------------------------------------------------
-    def modificar_producto(self, codigo, nueva_descripcion, nueva_cantidad, nuevo_precio, nueva_imagen, nuevo_proveedor):
-        sql = "UPDATE productos SET descripcion = %s, cantidad = %s, precio = %s, imagen_url = %s, proveedor = %s WHERE codigo = %s"
-        valores = (nueva_descripcion, nueva_cantidad, nuevo_precio, nueva_imagen, nuevo_proveedor, codigo)
+    def modificar_producto(self, codigo, nuevo_nombreCompleto, nuevo_telefono, nuevo_correo, nuevo_dia, nuevo_horaio, nueva_imagen):
+        sql = "UPDATE turnos SET nombreCompleto = %s, telefono = %s, correo = %s, imagen_url = %s, dia = %s, horario = %s WHERE codigo = %s"
+        valores = (nuevo_nombreCompleto, nuevo_telefono, nuevo_correo, nueva_imagen , nuevo_dia, nuevo_horaio, codigo)
         self.cursor.execute(sql, valores)
         self.conn.commit()
         return self.cursor.rowcount > 0
 
     #----------------------------------------------------------------
     def listar_productos(self):
-        self.cursor.execute("SELECT * FROM productos")
+        self.cursor.execute("SELECT * FROM turnos")
         productos = self.cursor.fetchall()
         return productos
 
     #----------------------------------------------------------------
     def eliminar_producto(self, codigo):
         # Eliminamos un producto de la tabla a partir de su código
-        self.cursor.execute(f"DELETE FROM productos WHERE codigo = {codigo}")
+        self.cursor.execute(f"DELETE FROM turnos WHERE codigo = {codigo}")
         self.conn.commit()
         return self.cursor.rowcount > 0
 
@@ -118,15 +120,15 @@ class Catalogo:
 # Cuerpo del programa
 #--------------------------------------------------------------------
 # Crear una instancia de la clase Catalogo
-catalogo = Catalogo(host='localhost', user='root', password='', database='miapp')
-#catalogo = Catalogo(host='USUARIO.mysql.pythonanywhere-services.com', user='USUARIO', password='CLAVE', database='USUARIO$miapp')
+#catalogo = Catalogo(host='localhost', user='root', password='', database='miapp')
+catalogo = Catalogo(host='Chasky.mysql.pythonanywhere-services.com', user='Chasky', password='baseRegistro', database='Chasky$miapp')
 
 
 # Carpeta para guardar las imagenes.
-RUTA_DESTINO = './static/imagenes/'
+#RUTA_DESTINO = '/home/Chasky/mysite/static/imagenes'
 
 #Al subir al servidor, deberá utilizarse la siguiente ruta. USUARIO debe ser reemplazado por el nombre de usuario de Pythonanywhere
-#RUTA_DESTINO = '/home/USUARIO/mysite/static/imagenes'
+RUTA_DESTINO = '/home/Chasky/mysite/static/imagenes'
 
 
 #--------------------------------------------------------------------
@@ -134,7 +136,7 @@ RUTA_DESTINO = './static/imagenes/'
 #--------------------------------------------------------------------
 #La ruta Flask /productos con el método HTTP GET está diseñada para proporcionar los detalles de todos los productos almacenados en la base de datos.
 #El método devuelve una lista con todos los productos en formato JSON.
-@app.route("/productos", methods=["GET"])
+@app.route("/turnos", methods=["GET"])
 def listar_productos():
     productos = catalogo.listar_productos()
     return jsonify(productos)
@@ -145,7 +147,7 @@ def listar_productos():
 #--------------------------------------------------------------------
 #La ruta Flask /productos/<int:codigo> con el método HTTP GET está diseñada para proporcionar los detalles de un producto específico basado en su código.
 #El método busca en la base de datos el producto con el código especificado y devuelve un JSON con los detalles del producto si lo encuentra, o None si no lo encuentra.
-@app.route("/productos/<int:codigo>", methods=["GET"])
+@app.route("/turnos/<int:codigo>", methods=["GET"])
 def mostrar_producto(codigo):
     producto = catalogo.consultar_producto(codigo)
     if producto:
@@ -157,16 +159,18 @@ def mostrar_producto(codigo):
 #--------------------------------------------------------------------
 # Agregar un producto
 #--------------------------------------------------------------------
-@app.route("/productos", methods=["POST"])
+@app.route("/turnos", methods=["POST"])
 #La ruta Flask `/productos` con el método HTTP POST está diseñada para permitir la adición de un nuevo producto a la base de datos.
 #La función agregar_producto se asocia con esta URL y es llamada cuando se hace una solicitud POST a /productos.
 def agregar_producto():
-    #Recojo los datos del form
-    descripcion = request.form['descripcion']
-    cantidad = request.form['cantidad']
-    precio = request.form['precio']
-    imagen = request.files['imagen']
-    proveedor = request.form['proveedor']  
+    #Recojo los datos del form  (nombreCompleto, telefofono, correo, dia, horario, imagen)
+    nombreCompleto = request.form['nombreCompleto']
+    telefono = request.form['telefono']
+    correo = request.form['correo']
+    dia = request.form['diaAtencion']
+    horario = request.form['horario']  
+    imagen = request.files['estudio']
+
     nombre_imagen=""
 
     
@@ -175,7 +179,7 @@ def agregar_producto():
     nombre_base, extension = os.path.splitext(nombre_imagen) #Separa el nombre del archivo de su extensión.
     nombre_imagen = f"{nombre_base}_{int(time.time())}{extension}" #Genera un nuevo nombre para la imagen usando un timestamp, para evitar sobreescrituras y conflictos de nombres.
 
-    nuevo_codigo = catalogo.agregar_producto(descripcion, cantidad, precio, nombre_imagen, proveedor)
+    nuevo_codigo = catalogo.agregar_producto(nombreCompleto, telefono, correo, dia, horario, nombre_imagen)
     if nuevo_codigo:    
         imagen.save(os.path.join(RUTA_DESTINO, nombre_imagen))
 
@@ -189,15 +193,17 @@ def agregar_producto():
 #--------------------------------------------------------------------
 # Modificar un producto según su código
 #--------------------------------------------------------------------
-@app.route("/productos/<int:codigo>", methods=["PUT"])
+@app.route("/turnos/<int:codigo>", methods=["PUT"])
 #La ruta Flask /productos/<int:codigo> con el método HTTP PUT está diseñada para actualizar la información de un producto existente en la base de datos, identificado por su código.
 #La función modificar_producto se asocia con esta URL y es invocada cuando se realiza una solicitud PUT a /productos/ seguido de un número (el código del producto).
 def modificar_producto(codigo):
     #Se recuperan los nuevos datos del formulario
-    nueva_descripcion = request.form.get("descripcion")
-    nueva_cantidad = request.form.get("cantidad")
-    nuevo_precio = request.form.get("precio")
-    nuevo_proveedor = request.form.get("proveedor")
+    nuevo_nombreCompleto = request.form.get("nombreCompleto")
+    nuevo_telefono = request.form.get("telefono")
+    nuevo_correo = request.form.get("correo")
+    nuevo_dia = request.form.get("dia")
+    nuevo_horario = request.form.get("horario")
+
     
     
     # Verifica si se proporcionó una nueva imagen
@@ -212,9 +218,9 @@ def modificar_producto(codigo):
         imagen.save(os.path.join(RUTA_DESTINO, nombre_imagen))
         
         # Busco el producto guardado
-        producto = catalogo.consultar_producto(codigo)
-        if producto: # Si existe el producto...
-            imagen_vieja = producto["imagen_url"]
+        turno = catalogo.consultar_producto(codigo)
+        if turno: # Si existe el producto...
+            imagen_vieja = turno["imagen_url"]
             # Armo la ruta a la imagen
             ruta_imagen = os.path.join(RUTA_DESTINO, imagen_vieja)
 
@@ -224,33 +230,33 @@ def modificar_producto(codigo):
     
     else:
         # Si no se proporciona una nueva imagen, simplemente usa la imagen existente del producto
-        producto = catalogo.consultar_producto(codigo)
-        if producto:
-            nombre_imagen = producto["imagen_url"]
+        turno = catalogo.consultar_producto(codigo)
+        if turno:
+            nombre_imagen = turno["imagen_url"]
 
 
     # Se llama al método modificar_producto pasando el codigo del producto y los nuevos datos.
-    if catalogo.modificar_producto(codigo, nueva_descripcion, nueva_cantidad, nuevo_precio, nombre_imagen, nuevo_proveedor):
+    if catalogo.modificar_producto(codigo, nuevo_nombreCompleto, nuevo_telefono, nuevo_correo, nuevo_dia, nuevo_horario, nombre_imagen):
         
         #Si la actualización es exitosa, se devuelve una respuesta JSON con un mensaje de éxito y un código de estado HTTP 200 (OK).
-        return jsonify({"mensaje": "Producto modificado"}), 200
+        return jsonify({"mensaje": "Turno modificado"}), 200
     else:
         #Si el producto no se encuentra (por ejemplo, si no hay ningún producto con el código dado), se devuelve un mensaje de error con un código de estado HTTP 404 (No Encontrado).
-        return jsonify({"mensaje": "Producto no encontrado"}), 403
+        return jsonify({"mensaje": "Turno no encontrado"}), 403
 
 
 
 #--------------------------------------------------------------------
 # Eliminar un producto según su código
 #--------------------------------------------------------------------
-@app.route("/productos/<int:codigo>", methods=["DELETE"])
+@app.route("/turnos/<int:codigo>", methods=["DELETE"])
 #La ruta Flask /productos/<int:codigo> con el método HTTP DELETE está diseñada para eliminar un producto específico de la base de datos, utilizando su código como identificador.
 #La función eliminar_producto se asocia con esta URL y es llamada cuando se realiza una solicitud DELETE a /productos/ seguido de un número (el código del producto).
 def eliminar_producto(codigo):
     # Busco el producto en la base de datos
-    producto = catalogo.consultar_producto(codigo)
-    if producto: # Si el producto existe, verifica si hay una imagen asociada en el servidor.
-        imagen_vieja = producto["imagen_url"]
+    turno = catalogo.consultar_producto(codigo)
+    if turno: # Si el producto existe, verifica si hay una imagen asociada en el servidor.
+        imagen_vieja = turno["imagen_url"]
         # Armo la ruta a la imagen
         ruta_imagen = os.path.join(RUTA_DESTINO, imagen_vieja)
 
@@ -261,13 +267,13 @@ def eliminar_producto(codigo):
         # Luego, elimina el producto del catálogo
         if catalogo.eliminar_producto(codigo):
             #Si el producto se elimina correctamente, se devuelve una respuesta JSON con un mensaje de éxito y un código de estado HTTP 200 (OK).
-            return jsonify({"mensaje": "Producto eliminado"}), 200
+            return jsonify({"mensaje": "Turno eliminado"}), 200
         else:
             #Si ocurre un error durante la eliminación (por ejemplo, si el producto no se puede eliminar de la base de datos por alguna razón), se devuelve un mensaje de error con un código de estado HTTP 500 (Error Interno del Servidor).
-            return jsonify({"mensaje": "Error al eliminar el producto"}), 500
+            return jsonify({"mensaje": "Error al eliminar el turno"}), 500
     else:
         #Si el producto no se encuentra (por ejemplo, si no existe un producto con el codigo proporcionado), se devuelve un mensaje de error con un código de estado HTTP 404 (No Encontrado). 
-        return jsonify({"mensaje": "Producto no encontrado"}), 404
+        return jsonify({"mensaje": "Turno no encontrado"}), 404
 
 #--------------------------------------------------------------------
 if __name__ == "__main__":

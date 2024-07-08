@@ -1,91 +1,116 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="google-site-verification"
+      content="ceH6CILJvrYh2UvfMN_0YGM6Q7wmeXWSkd419qCuagY"
+    />
+    <meta name="msvalidate.01" content="4668728EF6D19B5A3448D35BA1A4936B" />
+    <title>Formulario</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    />
+    <style>
+      body {
+        background-image: url("img/foto_formulario.jpg");
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listado de Productos 🚀</title>
-    <link rel="stylesheet" href="./static/css/estilos.css">
-</head>
+      .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
 
-<body>
-    <header>
-        <nav class="navbar-index ">
-            <img class="logo-nav" src="./static/imagenes/logos-nav.webp" alt="logo agencia de aprendizaje">
-        </nav>
-    </header>
+      .list {
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    
 
-    <div class="logo-centrado">
-        <img src="./static/imagenes/logo_Codo.jpg" alt="logo">
-    </div>
-    <h1>Listado de Productos del Inventario</h1><br>
-
-    <table> <!-- Se crea una tabla para mostrar los productos. -->
-        <thead> <!--Encabezado de la tabla con columnas para código, descripción, cantidad, precio y acciones.-->
+    <div class="container">
+      <div class="d-flex flex-column list">
+        <table class="table table-bordered ">
+          <h1 class="mx-auto">Listado de turnos</h1><br>
+          <thead>
             <tr>
-                <th>Código</th>
-                <th>Descripción</th>
-                <th>Cantidad</th>                
-                <th align="right">Precio</th>
-                <th>Imagen</th>
-                <th align="right">Proveedor</th>
-                
+              <th scope="col">codigo</th>
+              <th scope="col">Nombre y apellido</th>
+              <th scope="col">Telefono</th>
+              <th scope="col">Correo</th>
+              <th scope="col">Día</th>
+              <th scope="col">Horario</th>
+              <th scope="col">Estudio</th>
             </tr>
-        </thead>
-        <tbody id="tablaProductos"> </tbody>
-    </table><br>
-
-    <div class="contenedor-centrado">
-        <a href="index.html">Menu principal</a>
-    </div>
-
-    <script>
-        const URL = "http://127.0.0.1:5000/"
-
-        // Al subir al servidor, deberá utilizarse la siguiente ruta. USUARIO debe ser reemplazado por el nombre de usuario de Pythonanywhere
-        //const URL = "https://USUARIO.pythonanywhere.com/"
+          </thead>
+          <tbody id="tablaTurnos"> </tbody>
+        </table>
+        <a href="turnos_crud.html" class="btn btn-primary btn-block">Menu principal</a>
+        <img src="https://www.pythonanywhere.com/user/Chasky/files/home/Chasky/mysite/static/img/logo.jpg" alt="era imagen">
+      </div>
         
+    </div>
+    <script>
+      //const URL = "http://127.0.0.1:5000/"
 
-        // Realizamos la solicitud GET al servidor para obtener todos los productos.
-        fetch(URL + 'productos')
-            .then(function (response) {
-                if (response.ok) {
-                    //Si la respuesta es exitosa (response.ok), convierte el cuerpo de la respuesta de formato JSON a un objeto JavaScript y pasa estos datos a la siguiente promesa then.
-                    return response.json(); 
-            } else {
-                    // Si hubo un error, lanzar explícitamente una excepción para ser "catcheada" más adelante
-                    throw new Error('Error al obtener los productos.');
-                }
-            })
+      // Al subir al servidor, deberá utilizarse la siguiente ruta. USUARIO debe ser reemplazado por el nombre de usuario de Pythonanywhere
+      const URL = "https://Chasky.pythonanywhere.com/"
+      
 
-            //Esta función maneja los datos convertidos del JSON.
-            .then(function (data) {
-                let tablaProductos = document.getElementById('tablaProductos'); //Selecciona el elemento del DOM donde se mostrarán los productos.
+      // Realizamos la solicitud GET al servidor para obtener todos los productos.
+      fetch(URL + 'turnos')
+          .then(function (response) {
+              if (response.ok) {
+                  //Si la respuesta es exitosa (response.ok), convierte el cuerpo de la respuesta de formato JSON a un objeto JavaScript y pasa estos datos a la siguiente promesa then.
+                  return response.json(); 
+          } else {
+                  // Si hubo un error, lanzar explícitamente una excepción para ser "catcheada" más adelante
+                  throw new Error('Error al obtener los productos.');
+              }
+          })
 
-                // Iteramos sobre cada producto y agregamos filas a la tabla
-                for (let producto of data) {
-                    let fila = document.createElement('tr'); //Crea una nueva fila de tabla (<tr>) para cada producto.
-                    fila.innerHTML = '<td>' + producto.codigo + '</td>' +
-                        '<td>' + producto.descripcion + '</td>' +
-                        '<td align="right">' + producto.cantidad + '</td>' +
-                        '<td align="right">' + producto.precio + '</td>' +
-                        // Mostrar miniatura de la imagen
-                        '<td><img src=./static/imagenes/' + producto.imagen_url +' alt="Imagen del producto" style="width: 100px;"></td>' + '<td align="right">' + producto.proveedor + '</td>';
-                        
-                        //Al subir al servidor, deberá utilizarse la siguiente ruta. USUARIO debe ser reemplazado por el nombre de usuario de Pythonanywhere
-                        //'<td><img src=https://www.pythonanywhere.com/user/USUARIO/files/home/USUARIO/mysite/static/imagenes/' + producto.imagen_url +' alt="Imagen del producto" style="width: 100px;"></td>' + '<td align="right">' + producto.proveedor + '</td>';
-                    
-                    //Una vez que se crea la fila con el contenido del producto, se agrega a la tabla utilizando el método appendChild del elemento tablaProductos.
-                    tablaProductos.appendChild(fila);
-                }
-            })
+          //Esta función maneja los datos convertidos del JSON.
+          .then(function (data) {
+              let tablaTurnos= document.getElementById('tablaTurnos'); //Selecciona el elemento del DOM donde se mostrarán los productos.
+              console.log(tablaTurnos)
+              // Iteramos sobre cada producto y agregamos filas a la tabla
+              for (let turno of data) {
+                  let fila = document.createElement('tr'); //Crea una nueva fila de tabla (<tr>) para cada producto.
+                  fila.innerHTML = '<th scope="row">' + turno.codigo + '</th>' +
+                      '<td>' + turno.nombreCompleto + '</td>' +
+                      '<td align="right">' + turno.telefono + '</td>' +
+                      '<td align="right">' + turno.correo + '</td>' +
+                      '<td align="right">' + turno.dia + '</td>' +
+                      '<td align="right">' + turno.horario + '</td>' +
+                      // Mostrar miniatura de la imagen
+                      //'<td><img src=./static/imagenes/' + turno.imagen_url +' alt="Imagen del producto" style="width: 100px;"></td>';
+                      
+                      //Al subir al servidor, deberá utilizarse la siguiente ruta. USUARIO debe ser reemplazado por el nombre de usuario de Pythonanywhere
+                      '<td><img src=https://www.pythonanywhere.com/user/Chasky/files/home/Chasky/mysite/static/img/' + turno.imagen_url +' alt="Imagen del producto" style="width: 100px;"></td>';
+                      //https://www.pythonanywhere.com/user/Chasky/files/home/Chasky/mysite/static/imagenes/Plano_Vidriera_1720402452.jpg
+                      //https://www.pythonanywhere.com/user/juanmyrock/files/home/juanmyrock/mysite/static/img/
+                  //Una vez que se crea la fila con el contenido del producto, se agrega a la tabla utilizando el método appendChild del elemento tablaProductos.
+                  tablaTurnos.appendChild(fila);
+              }
+          })
 
-            //Captura y maneja errores, mostrando una alerta en caso de error al obtener los productos.
-            .catch(function (error) {
-                // Código para manejar errores
-                alert('Error al obtener los productos.');
-            });
+          //Captura y maneja errores, mostrando una alerta en caso de error al obtener los productos.
+          .catch(function (error) {
+              // Código para manejar errores
+              alert('Error al obtener los turnos. ' +error);
+          });
     </script>
-</body>
+  </body>
 </html>
