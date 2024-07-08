@@ -128,7 +128,7 @@ catalogo = Catalogo(host='Chasky.mysql.pythonanywhere-services.com', user='Chask
 #RUTA_DESTINO = '/home/Chasky/mysite/static/imagenes'
 
 #Al subir al servidor, deberá utilizarse la siguiente ruta. USUARIO debe ser reemplazado por el nombre de usuario de Pythonanywhere
-RUTA_DESTINO = '/home/Chasky/mysite/static/imagenes'
+RUTA_DESTINO = '/home/Chasky/mysite/static/img'
 
 
 #--------------------------------------------------------------------
